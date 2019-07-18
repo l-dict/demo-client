@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SB Admin 2 - Bootstrap Admin Theme</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="../vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <div class="login">
+        {{msg}}
+        <div>
+            用户名：
+            <input type="text" v-model="name">
+        </div>
+        <div>
+            密码：
+            <input type="text" v-model="password">
+        </div>
+        <button @click="login">登录</button>
+        <button @click="register">注册</button>
+        <button @click="getAll">获得所有用户</button>
+        <div v-show="showID">
+            <p>用户id：{{nameId}}</p>
+        </div>
+        <div v-show="showAll">
+      
+        </div>
+    </div>
+
+</body>
+
+</html>
+<script>
+    export default {
+        name: "login",
+        data(){
+            return{
+                msg: "登录注册",
+                name: '',
+                password: '',
+                nameId: "",
+                showID: false,
+                array: [],
+                showAll: false
+            }
+        },
+        methods:{
+            login(){
+                this.showAll = false
+                this.showID = false
+                let params = {
+                    name: this.name,
+                    password: this.password
+                }
+                this.$http.post('/api/user/login',params).then((res)=>{
+                    console.log(res)
+                    if(res.data.status == 1000){
+                       this.showID = true
+                       this.nameId = res.data.data[0]._id
+                    }else{
+                        alert(res.data.message)
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            },
+            register(){
+                this.showAll = false
+                this.showID = false
+                let params = {
+                    name: this.name,
+                    password: this.password
+                }
+                this.$http.post('/api/user/register',params).then((res)=>{
+                    console.log(res)
+                    if(res.data.status == 1000){
+                       alert(res.data.message)
+                    }else{
+                        alert(res.data.message)
+                    }
+                }).catch((err)=>{
+                    console.log(err)
+                })
+            },
+            getAll(){
+                this.$http.get('/api/user/all').then((res) => {
+                    console.log(res)
+                    if(res.data.length>0){
+                        this.showAll = true
+                        this.array = res.data
+                    }else{
+                        alert("无注册用户！")
+                    }
+                }).catch((err) => {
+                    console.log(err)
+                })
+            },
+            deleteone(names){
+                let params = {
+                    name: names
+                }
+                this.$http.post('/api/user/delete',params).then((res) => {
+                    console.log(res)
+                    this.array = res.data.data
+                }).catch((err) => {
+                    console.log(err)
+                })
+            }
+        }
+    }
+    </script>
